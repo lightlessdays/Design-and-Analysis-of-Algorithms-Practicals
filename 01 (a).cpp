@@ -1,32 +1,55 @@
-#include <iostream>
-using namespace std;
+//Insertion Sort
 
-int insertionSort(int arr[], int n) {
-    int comparisons = 0;
-    for (int i = 1; i < n; i++) {
-        int key = arr[i];
-        int j = i - 1;
-        while (j >= 0 && arr[j] > key) {
-            arr[j+1] = arr[j];
-            j = j - 1;
-            comparisons++;
-        }
-        arr[j+1] = key;
-    }
-    return comparisons;
+#include<iostream.h>
+#include<conio.h>
+
+void display(int *a, int size) {
+    cout<<"{ ";
+    for(int i=0; i<size; i++ )
+	cout<<a[i]<<' ';
+    cout<<"}"<<endl;
 }
 
-int main() {
-    int arr[] = { 12, 11, 13, 5, 6 };
-    int n = sizeof(arr) / sizeof(arr[0]);
+int insertionSort(int *a, int n)
+{
+  int i, j, k, comperision = 0;
+  for(i=1; i<n; i++)
+  {
+    comperision++;
+    k = a[i];
+    for(j=i-1; (a[j]>k) && (j>=0); j--)
+    {
+        comperision += 2;
+        a[j+1] = a[j];
+    }
+    a[j+1] = k;
+  }
+  return comperision;
+}
 
-    int comparisons = insertionSort(arr, n);
+void main()
+{
+ clrscr();
+ int size, i, *arr;
 
-    cout << "Sorted array: ";
-    for (int i = 0; i < n; i++)
-        cout << arr[i] << " ";
-    cout << endl;
-    cout << "Number of comparisons: " << comparisons << endl;
+ cout<<"\nEnter the size of array (max. 10): ";
+ cin>>size;
+ arr = new int[size];
+ cout<<"\nEnter the array: \n";
+ for(i=0; i<size; i++)
+   cin>>arr[i];
 
-    return 0;
+ clrscr();
+ cout<<"\n Your array: \n";
+ display(arr, size);
+
+ getch();
+ clrscr();
+ cout<<"\n\nTotal comperision made: "<<insertionSort(arr, size);
+
+ cout<<"\n Sorted array: ";
+ display(arr, size);
+
+
+ getch();
 }
