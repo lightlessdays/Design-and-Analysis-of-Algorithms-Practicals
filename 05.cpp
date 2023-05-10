@@ -1,179 +1,62 @@
-//  Red-Black Tree
-//  INsertion & Inorder Traversal
+#include <iostream>
+#include <vector>
+#include <algorithm>
 
-#include<stdlib.h>
-#include <iostream.h>
-#include <conio.h>
-
-#define RED	1
-#define BLACK	2
-
-
-struct node {
-	int key;
-
-	struct node *left, *right, *p;
-	int color;
-};
-
-typedef struct node *NODEPTR;
-struct node NIL;
-NODEPTR NILPTR = &NIL;
-
-void inorder(NODEPTR x) {
-	if (x != NILPTR) {
-    inorder(x->left);
-    char c = (x->color == RED) ? 'R' : 'B';
-		cout<<x->key<<"("<<c<<")  ";
-		inorder(x->right);
-	}
+// Function to perform insertion sort on a bucket
+void insertionSort(std::vector<int>& bucket) {
+    int n = bucket.size();
+    for (int i = 1; i < n; i++) {
+        int key = bucket[i];
+        int j = i - 1;
+        while (j >= 0 && bucket[j] > key) {
+            bucket[j + 1] = bucket[j];
+            j--;
+        }
+        bucket[j + 1] = key;
+    }
 }
 
-void leftrotate(NODEPTR *treeroot, NODEPTR x) {
-	NODEPTR y = x->right;
-	x->right = y->left;
-	if (y->left != NILPTR)
-		y->left->p = x;
-	y->p = x->p;
-	if (x->p == NILPTR)
-		*treeroot = y;
-	else if (x->p->left == x)
-		x->p->left = y;
-	else
-		x->p->right = y;
-	y->left = x;
-	x->p = y;
+// Bucket Sort function
+void bucketSort(std::vector<int>& arr, int n) {
+    // Create empty buckets
+    std::vector<std::vector<int>> buckets(n);
+
+    // Put elements into respective buckets
+    for (int i = 0; i < n; i++) {
+        int bucketIndex = n * arr[i];
+        buckets[bucketIndex].push_back(arr[i]);
+    }
+
+    // Sort individual buckets
+    for (int i = 0; i < n; i++)
+        insertionSort(buckets[i]);
+
+    // Concatenate all buckets into the original array
+    int index = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < buckets[i].size(); j++) {
+            arr[index] = buckets[i][j];
+            index++;
+        }
+    }
 }
 
-void rightrotate(NODEPTR *treeroot, NODEPTR y) {
-	NODEPTR x = y->left;
-	y->left = x->right;
-	if (x->right != NILPTR)
-		x->right->p = y;
-	x->p = y->p;
-	if (y->p == NILPTR)
-		*treeroot = x;
-	else if (y->p->left == y)
-		y->p->left = x;
-	else
-		y->p->right = x;
-	x->right = y;
-	y->p = x;
-}
+int main() {
+    int numValues;
+    std::cout << "Enter the number of values: ";
+    std::cin >> numValues;
 
-void rbinsertfixup(NODEPTR *treeroot, NODEPTR z) {
-	while (z->p->color == RED) {
-		if (z->p == z->p->p->left) {
-			NODEPTR y = z->p->p->right;
-			if (y->color == RED) {
-				z->p->color = BLACK;
-				y->color = BLACK;
-				z->p->p->color = RED;
-				z = z->p->p;
-			}
-			else {
-				if (z == z->p->right) {
-					z = z->p;
-					leftrotate(treeroot,z);
-				}
-				z->p->color = BLACK;
-				z->p->p->color = RED;
-				rightrotate(treeroot,z->p->p);
-			}
-		}
-		else {
-			NODEPTR y = z->p->p->left;
-			if (y->color == RED) {
-				z->p->color = BLACK;
-				y->color = BLACK;
-				z->p->p->color = RED;
-				z = z->p->p;
-			}
-			else {
-				if (z == z->p->left) {
-					z = z->p;
-					rightrotate(treeroot,z);
-				}
-				z->p->color = BLACK;
-				z->p->p->color = RED;
-				leftrotate(treeroot,z->p->p);
-			}
-		}
-	}
-	(*treeroot)->color = BLACK;
-}
+    std::vector<int> arr(numValues);
+    std::cout << "Enter the values:\n";
+    for (int i = 0; i < numValues; i++)
+        std::cin >> arr[i];
 
-void rbinsert(NODEPTR *treeroot, int z) {
-	NODEPTR Z = (NODEPTR) malloc(sizeof(struct node));
-	Z->key = z;
-	NODEPTR y = NILPTR;
-	NODEPTR x = *treeroot;
-	while (x != NILPTR) {
-		y = x;
-		if (Z->key < x->key)
-			x = x->left;
-		else
-			x = x->right;
-	}
-	Z->p = y;
-	if (y == NILPTR)
-		*treeroot = Z;
-	else if (Z->key < y->key)
-		y->left = Z;
-	else
-		y->right = Z;
-	Z->left = NILPTR;
-	Z->right = NILPTR;
-	Z->color = RED;
-	rbinsertfixup(treeroot,Z);
-}
+    bucketSort(arr, numValues);
 
-////////////////////////////////////////////
+    std::cout << "Sorted array: ";
+    for (int i = 0; i < numValues; i++)
+        std::cout << arr[i] << " ";
+    std::cout << std::endl;
 
-int menu() {
-  clrscr();
-  int c;
-  cout<<"\nMENU (RBT)\n---------\n";
-  cout<<"\n1) Insert Node"
-      <<"\n2) Traversal"
-      <<"\n3) Exit"
-      <<"\n\n* Enter your choice: ";
-      cin>>c;
-  clrscr();
-  return c;
-}
-
-int main()
-{
-  clrscr();
-	NIL.left = NIL.right = NIL.p = NILPTR;
-	NIL.color = BLACK;
-	NODEPTR tree = NILPTR;
-	int n;
-	int num;
-
-	while (1) {
-    n = menu();
-			switch(n){
-			case 1:	cout<<"\nEnter value of the node: ";
-							cin>>num;
-					rbinsert(&tree, num);
-				break;
-
-
-				case 2:
-					cout<<"\n\nInorder traversal:\n\n";
-					inorder(tree);
-					cout<<"\n";
-					getch();
-					break;
-
-					case 3: goto end;
-
-					default:  cout<<"\nInvalid Input!! Try again.";
-										getch();
-				}
-			}
-      end:
-		return 0;
+    return 0;
 }
