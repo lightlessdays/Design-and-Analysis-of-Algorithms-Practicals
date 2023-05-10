@@ -1,87 +1,78 @@
-//Heap Sort
+#include <iostream>
+#include <vector>
 
-#include <iostream.h>
-#include <conio.h>
+using namespace std;
 
-int comparison = 0;
+// Function to heapify a subtree rooted at 'rootIndex'
+// n is the size of the heap
+// compCount is the reference to the comparison count
+void heapify(vector<int>& arr, int n, int rootIndex, int& compCount) {
+    int largest = rootIndex;  // Initialize largest as root
+    int left = 2 * rootIndex + 1;  // Left child
+    int right = 2 * rootIndex + 2; // Right child
 
-void display(int *a, int size) {
-    cout<<"{ ";
-    for(int i=0; i<size; i++ )
-	cout<<a[i]<<' ';
-    cout<<"}"<<endl;
+    // If left child is larger than root
+    if (left < n && arr[left] > arr[largest]) {
+        largest = left;
+    }
+
+    // If right child is larger than largest so far
+    if (right < n && arr[right] > arr[largest]) {
+        largest = right;
+    }
+
+    // If largest is not root
+    if (largest != rootIndex) {
+        swap(arr[rootIndex], arr[largest]);
+
+        // Recursively heapify the affected sub-tree
+        heapify(arr, n, largest, compCount);
+        compCount += 1;  // Increment the comparison count
+    }
 }
 
-void swap(int *a, int x, int y){
-  int temp = a[y];
-  a[y] = a[x];
-  a[x] = temp;
+// Main function to perform heap sort
+// arr is the array to be sorted
+// compCount is the reference to the comparison count
+void heapSort(vector<int>& arr, int& compCount) {
+    int n = arr.size();
+
+    // Build heap (rearrange array)
+    for (int i = n / 2 - 1; i >= 0; i--) {
+        heapify(arr, n, i, compCount);
+    }
+
+    // One by one extract an element from heap
+    for (int i = n - 1; i > 0; i--) {
+        swap(arr[0], arr[i]);
+
+        // call max heapify on the reduced heap
+        heapify(arr, i, 0, compCount);
+        compCount += 1;  // Increment the comparison count
+    }
 }
 
-void maxHeapify(int *a, int index, int heapSize)
-{
-  int left = index*2 + 1;
-  int right = index*2 + 2;
-  int largest = index;
+int main() {
+    int numElements;
+    cout << "Enter the number of elements: ";
+    cin >> numElements;
 
-  if(left < heapSize && a[left] > a[largest]){
-    largest = left;
-	  comparison+=2;
-  }
-  if(right < heapSize && a[right] > a[largest]){
-    largest = right;
-	  comparison+=2;
-  }
+    vector<int> elements(numElements);
+    cout << "Enter the elements: ";
+    for (int i = 0; i < numElements; i++) {
+        cin >> elements[i];
+    }
 
-  if(largest != index){
-    comparison++;
-    swap(a, largest, index);
-    maxHeapify(a, largest, heapSize);
-  }
-}
+    int comparisonCount = 0;
+    heapSort(elements, comparisonCount);
 
-void buildMaxHeap(int *a, int n)
-{
-  for (int i = (n/2) - 1; i >= 0; i--) {
-    maxHeapify(a, i, n);
-    comparison++;
-  }
-}
+    cout << "Sorted array: ";
+    for (int i = 0; i < numElements; i++) {
+        cout << elements[i] << " ";
+    }
+    cout << endl;
 
-void heapSort(int *a, int size)
-{
-  buildMaxHeap(a, size);
-  int heapSize = size, i;
-  for(i=size-1; i>=0; i--) {
-  	swap(a, 0, i);
-  	heapSize--;
-  	comparison++;
-  	maxHeapify(a,0,heapSize);
-  }
-}
+    cout << "Number of comparisons: " << comparisonCount << endl;
 
-void main()
-{
- clrscr();
- int size, i, *arr;
- cout<<"\nEnter the size of array (max. 10): ";
- cin>>size;
- arr = new int[size];
-
- cout<<"\nEnter the array: \n";
- for(i=0; i<size; i++)
-   cin>>arr[i];
- clrscr();
-
- cout<<"\n Your array: \n";
- display(arr, size);
- getch();
- clrscr();
-
- heapSort(arr, size);
- cout<<"\n\nTotal comperision made: "<<comparison;
-
- cout<<"\n Sorted array: \n";
- display(arr, size);
- getch();
+    return 0;
 }
