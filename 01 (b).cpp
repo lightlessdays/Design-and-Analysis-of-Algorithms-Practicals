@@ -1,76 +1,75 @@
-//Merge Sort
+#include <iostream>
+#include <vector>
 
-#include<iostream.h>
-#include<conio.h>
+using namespace std;
 
-int comparison = 0;
-void display(int *a, int size) {
-    cout<<"{ ";
-    for(int i=0; i<size; i++ )
-	cout<<a[i]<<' ';
-    cout<<"}"<<endl;
-}
+long long merge(vector<int>& arr, int left, int mid, int right) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
 
-void merge(int *a, int beg, int mid, int end)
-{
-  int size = end - beg + 1;
-  int *temp = new int[size];
-  int i=beg, j=mid+1, k=0;
+    vector<int> L(n1), R(n2);
 
-  //arranging in order
-  while (i <= mid && j<=end) {
-    temp[k++] = (a[i]<a[j]) ? a[i++] : a[j++];
-    comparison += 3;
-  }
-  while(i<=mid){
-    comparison++;
-    temp[k++] = a[i++];
-  }
-  while(j<end){
-    comparison++;
-    temp[k++] = a[j++];
-  }
+    for (int i = 0; i < n1; i++)
+        L[i] = arr[left + i];
+    for (int j = 0; j < n2; j++)
+        R[j] = arr[mid + 1 + j];
 
-  for(i=0; i<k; i++)
-  {
-    a[i+beg] = temp[i];
-  }
-}
+    int i = 0, j = 0, k = left;
+    long long comparisons = 0;
 
-void mergeSort(int* a,int beg, int end)
-{
-    if (beg < end) {
-	comparison++;
-        int mid = (beg+end)/2;
-        mergeSort(a, beg, mid);
-        mergeSort(a, mid+1, end);
-        merge(a, beg, mid, end);
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j]) {
+            arr[k++] = L[i++];
+        } else {
+            arr[k++] = R[j++];
+        }
+        comparisons++;
     }
+
+    while (i < n1) {
+        arr[k++] = L[i++];
+        comparisons++;
+    }
+
+    while (j < n2) {
+        arr[k++] = R[j++];
+        comparisons++;
+    }
+
+    return comparisons;
 }
 
-void main()
-{
- clrscr();
- int size, i, *arr;
+long long mergeSort(vector<int>& arr, int left, int right) {
+    long long comparisons = 0;
+    if (left < right) {
+        int mid = left + (right - left) / 2;
 
- cout<<"\nEnter the size of array (max. 10): ";
- cin>>size;
- arr = new int[size];
- cout<<"\nEnter the array: \n";
- for(i=0; i<size; i++)
-   cin>>arr[i];
+        comparisons += mergeSort(arr, left, mid);
+        comparisons += mergeSort(arr, mid + 1, right);
 
- clrscr();
- cout<<"\n Your array: \n";
- display(arr, size);
+        comparisons += merge(arr, left, mid, right);
+    }
+    return comparisons;
+}
 
- getch();
- clrscr();
- mergeSort(arr, 0, size-1);
- cout<<"\n\nTotal comperision made: "<<comparison;
+int main() {
+    int n;
+    cout << "Enter the number of elements: ";
+    cin >> n;
 
- cout<<"\n Sorted array: \n";
- display(arr, size);
+    vector<int> arr(n);
+    cout << "Enter the elements:\n";
+    for (int i = 0; i < n; i++)
+        cin >> arr[i];
 
- getch();
+    long long comparisons = mergeSort(arr, 0, n - 1);
+
+    cout << "Sorted array: ";
+    for (int num : arr)
+        cout << num << " ";
+    cout << "\n";
+
+    cout << "Number of comparisons made: " << comparisons << endl;
+
+    return 0;
 }
